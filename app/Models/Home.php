@@ -9,6 +9,16 @@ class Home extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'user_id',
+        'location',
+        'image_path',
+        'size',
+        'description',
+        'cost',
+        'for'
+    ];
     // one home belongs to one user only
     public function users() {
         return $this->belongsToMany(User::class);
