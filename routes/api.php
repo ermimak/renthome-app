@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\ContractController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
+use App\Models\Contract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,7 +31,11 @@ Route::group(['middleware'=>['auth:sanctum']],function () {
     Route::get('/home/{id}',[HomeController::class,'show']);
     Route::get('/my',[HomeController::class,'list']);
     Route::post('/home',[HomeController::class,'create']);
-    Route::put('/home',[HomeController::class,'update']);
+    Route::post('/home/{id}/contract',[ContractController::class,'store']);
+    Route::get('/home/{id}/rent',[HomeController::class,'rent']);
+    Route::get('/home/{id}/buy',[HomeController::class,'buy']);
+
+    Route::put('/home/{id}',[HomeController::class,'update']);
     Route::delete('/home/{id}',[HomeController::class,'destroy']);
 });
 
