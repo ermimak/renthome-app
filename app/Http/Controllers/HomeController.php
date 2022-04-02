@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\HomeRequest;
+use App\Models\Contract;
 use App\Models\Home;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class HomeController extends Controller
@@ -57,7 +59,7 @@ class HomeController extends Controller
     }
 
     //update
-    public function update(Request $request)
+    public function update(Request $request,$id)
     {
         //validate
         $request->validate([
@@ -69,9 +71,12 @@ class HomeController extends Controller
             'description' => 'string',
             'cost' => 'numeric',
         ]);
+
         //update
-        $id = auth()->user()->id;
-        $home = Home::where('user_id','=',$id)->first();
+        $user_id = auth()->user()->id;
+        //$home = Home::where('id','=',$id,'user_id','=',$user_id)->first();
+        $home = Home::query()->where('id','=',$id)
+                                    ->where('user_id','=',$user_id)->first();
         $home->name = isset($request->name) ? $request->name : $home->name;
         $home->location = isset($request->location) ? $request->location : $home->location;
         $home->image_path = isset($request->image_path) ? $request->image_path : $home->image_path;
@@ -80,17 +85,36 @@ class HomeController extends Controller
         $home->cost = isset($request->cost) ? $request->cost : $home->cost;
         $home->for = isset($request->for) ? $request->for : $home->for;
         $home->update();
-        /*
-        Home::where('user_id','=',$id)->update([
-            isset($request->name) ? $request->name : $home->name ,
-            isset($request->location) ? $request->location : $home->location,
-
-        ]);*/
 
         //response
         return response()->json([
             'status' => '200',
             'message' => 'Home information updated succesfully',
         ]);
+    }
+
+    //rent home
+    public function rent(Request $request,$id)
+    {
+        $home = Home::query()->where('id','=',$id)->first();
+        $check = Contract::where('home_id','=',$id)->first();
+
+        if($check->signed == true){
+            $home->rented = true;
+            $home->update();
+
+            return response()->json([
+                "status" => "200",
+                "message" => "you rented a home",
+                "data" => $home
+            ]);
+        }
+        else
+        {
+            return response()->json([
+                "status" => "200",
+                "message" => "The home is already rented or unavailable",
+            ]);
+        }
     }
 }
